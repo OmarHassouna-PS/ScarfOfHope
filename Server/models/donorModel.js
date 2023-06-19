@@ -23,11 +23,6 @@ const donorSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: true,
-    maxlength: 20,
-  },
-  address: {
-    type: String,
-    required: true,
     maxlength: 50,
   },
   is_delete: {

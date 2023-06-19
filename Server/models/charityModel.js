@@ -20,12 +20,11 @@ const charitiesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  phone: {
+  serial_number: {
     type: String,
     required: true,
-    maxlength: 20,
   },
-  address: {
+  phone: {
     type: String,
     required: true,
     maxlength: 50,
@@ -40,6 +39,6 @@ const charitiesSchema = new mongoose.Schema({
   },
 });
 
-const Charities = mongoose.model('Charities', charitiesSchema);
+const Charity = mongoose.model('Charity', charitiesSchema);
 
-module.exports = Charities;
+module.exports = Charity;

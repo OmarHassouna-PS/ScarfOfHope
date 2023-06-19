@@ -10,3 +10,27 @@
 .hero-img {
     background-image: url(../Images/SignUp-Hero-img.png);
 } 
+
+.password {
+    position: relative;
+  }
+  
+  .password .eye {
+    cursor: pointer;
+    position: absolute;
+    left: 13px;
+    top: 33px;
+  }
+  
+  .password .eye {
+    left: 25px;
+    top: 34px;
+  }
+  
+  .fas {
+    line-height: 2;
+  }
+  
+  .eye i {
+    color: var(--bold-main-color);
+  }

@@ -1,72 +1,83 @@
 const Admin = require("../models/adminModel");
+const Donor = require("../models/donorModel");
+const Charity = require("../models/charityModel");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const errorHandler = require("../middleware/500");
 
 const createToken = (req, res) => {
-  
+
   const accessToken = jwt.sign(
-    JSON.parse(JSON.stringify({userId : req.body?.admin_id || req.body?.donor_id || req.body?.charities_id, role : req.body.role})),
+    JSON.parse(JSON.stringify({ userId: req.body._id, role: req.body.role, email: req.body.email })),
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "1w" }
   );
-  res.json({ Token : accessToken, data : req.body})
+
+  res.json({ Token: accessToken, data: req.body })
 }
 
-const Login = async (req, res, next) => {
+const loginDonor = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await Donor.findOne({ email: email });
+
+    if (!user || !(await bcrypt.compare(password, user.password)) || user.is_delete) {
+
+      return res.status(401).send("incorrect email or password");
+    }
+    req.body = user;
+    next();
+
+  } catch (error) {
+    errorHandler(error, req, res);
+  }
+};
+
+const loginAdmin = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
     const user = await Admin.findOne({ email: email });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !(await bcrypt.compare(password, user.password)) || user.is_delete) {
 
-      res.status(401).send("incorrect email or password");
+      return res.status(401).send("incorrect email or password");
     }
     req.body = user;
     next();
-    
+
   } catch (error) {
     errorHandler(error, req, res);
   }
-
 };
 
-const SignUp_admin = async (req, res, next) => {
-  const { username, email, password, phone, address } = req.body;
+const loginCharity = async (req, res, next) => {
+  const { email, password } = req.body;
 
   try {
-    const user = await Admin.findOne({ email: email });
+    const user = await Charity.findOne({ email: email });
 
-    if (!user) {
+    if (!user || !(await bcrypt.compare(password, user.password)) || user.is_delete) {
 
-      return res.status(401).send("Email already taken");
+      return res.status(401).send("incorrect email or password");
     }
+
+    if (!user.active) {
+
+      return res.status(401).send("Don't have access");
+    }
+    req.body = user;
+    next();
+
   } catch (error) {
     errorHandler(error, req, res);
   }
-
-  const hashedPwd = await bcrypt.hash(password, 10);
-
-    const newAdmin = new Admin({
-      role: 'admin',
-      username: username,
-      email: email,
-      password: hashedPwd,
-      phone: phone,
-      address: address,
-    });
-
-  const user = await newAdmin.save();
-
-  req.body = user;
-  next();
 };
 
 module.exports = {
-  Login,
-  SignUp_admin,
-  // SignUp_donor,
-  // SignUp_charities,
+  loginDonor,
+  loginAdmin,
+  loginCharity,
   createToken,
 }; 

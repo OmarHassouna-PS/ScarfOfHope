@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRef } from "react";
-import emailjs from "@emailjs/browser";
-
+import axios from "axios";
 export default function ContactUs() {
 
   useEffect(() => {
@@ -15,36 +14,34 @@ export default function ContactUs() {
     theme: ''
   });
 
-  const sendEmail = (event) => {
+
+  const sendEmail = async (event) => {
     event.preventDefault();
 
-    const email = event.target.user_name.value;
-    const user_email = event.target.user_email.value;
+    const name = event.target.user_name.value;
+    const email = event.target.user_email.value;
     const message = event.target.message.value;
+    const patternEmail = /^[A-z0-9\.]+@[A-z0-9]+\.[A-z]{3,5}$/;
 
-    if (!email || !user_email || !message) {
-      setMassage({ msg: 'Please fill in all fields!.', theme: 'red' });
+    if (!email || !name || !message) {
+      setMassage({ msg: 'الرجاء تعبئة جميع الحقول', theme: 'red' });
       return;
     }
 
-    emailjs
-      .sendForm(
-        "service_o4z25iw",
-        "template_dhlo5h4",
-        form.current,
-        "IuZ5ilZIX-c2uVwa7"
-      )
-      .then(
-        (result) => {
-          setMassage({ msg: 'Your message has been sent successfully, our team will contact you as soon as possible.', theme: 'green' });
-        },
-        (error) => {
-          setMassage({ msg: 'Something went wrong, please try again later!.', theme: 'red' });
-          console.log("massage error :" + error)
-        }
-      );
-      
-    document.getElementById('form').reset();
+    if (!patternEmail.test(email)) {
+      setMassage({ msg: 'بريد الكتروني غير صالح', theme: 'red' });
+      return;
+    }
+
+    try {
+      const res = await axios.post('http://localhost:8000/message', { name, email, message });
+      console.log(res);
+      event.target.reset();
+      setMassage({ msg: 'تم إرسال رسالتك بنجاح ، سيقوم فريقنا بالاتصال بك في أقرب وقت ممكن', theme: 'green' });
+    } catch (error) {
+      setMassage({ msg: 'هناك شئ خاطئ، يرجى المحاولة فى وقت لاحق', theme: 'red' });
+      console.log(error);
+    }
   };
 
   return (
@@ -68,42 +65,42 @@ export default function ContactUs() {
                       backdropFilter: "blur(30px)",
                     }}
                   >
-                    <h2 className="text-3xl font-bold mb-12">Contact us</h2>
+                    <h2 className="text-3xl font-bold mb-12">تواصل معنا</h2>
                     <form id="form" ref={form} onSubmit={sendEmail}>
                       <div className="form-group mb-6">
                         <input
                           type="text"
                           name="user_name"
-                          className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                          className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border-2 border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-teal-600 focus:outline-none"
                           id="exampleInput7"
-                          placeholder="Name"
+                          placeholder="الاسم"
                         />
                       </div>
                       <div className="form-group mb-6">
                         <input
                           type="email"
                           name="user_email"
-                          className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                          className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border-2 border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-teal-600 focus:outline-none"
                           id="exampleInput8"
-                          placeholder="Email address"
+                          placeholder="البريد الالكتروني"
                         />
                       </div>
                       <div className="form-group mb-6">
                         <textarea
                           name="message"
-                          className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                          className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border-2 border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-teal-600 focus:outline-none"
                           id="exampleFormControlTextarea13"
                           rows={3}
-                          placeholder="Message"
+                          placeholder="الرسالة"
                           defaultValue={""}
                         />
                       </div>
                       <button
                         type="submit"
                         value="send"
-                        className="w-full px-6 py-2.5 bg-emerald-300 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-teal-600 hover:shadow-lg focus:bg-teal-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-teal-600 active:shadow-lg transition duration-150 ease-in-out"
+                        className="w-full px-6 py-2.5 bg-teal-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-teal-700 hover:shadow-lg focus:bg-teal-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-teal-700 active:shadow-lg transition duration-150 ease-in-out"
                       >
-                        Send
+                        ارسال
                       </button>
                     </form>
                     <p className={`font-bold mt-3 text-${massage.theme}-500`}>{massage.msg}</p>

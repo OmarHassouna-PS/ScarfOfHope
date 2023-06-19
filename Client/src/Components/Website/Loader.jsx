@@ -1,14 +1,14 @@
-import HashLoader
-from "react-spinners/HashLoader";
+import GridLoader
+from "react-spinners/GridLoader";
 import '../../CSS/App.css'
 
 export default function Loader() {
   return (
     <div className="Loader">
-    <HashLoader
+    <GridLoader
         color={'#A0D8B3'}
         loading={true}
-        size={100}
+        size={20}
     />
     </div>
   )

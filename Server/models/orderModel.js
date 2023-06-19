@@ -1,7 +1,23 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  phone: {
+    type: String,
+    required: true,
+  },
   order_status: {
+    type: String,
+    required: true,
+  },
+  type: {
     type: String,
     required: true,
   },
@@ -13,9 +29,10 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  order_type: {
+  address: {
     type: String,
     required: true,
+    maxlength: 50,
   },
   is_delete: {
     type: Boolean,
@@ -28,11 +45,6 @@ const orderSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: false,
-  },
-  donor_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Donor',
-    required: true,
   },
 });
 
